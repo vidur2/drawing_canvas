@@ -6,6 +6,7 @@ import { Matrix, inverse } from "ml-matrix";
 
 export default function Home() {
   const [dragging, setDragging] = useState(false);
+
   useEffect(() => {
     const map = new Array();
     const canvas = document.getElementById("canvas");
@@ -20,14 +21,18 @@ export default function Home() {
 
     canvas.onmouseup = () => {
       setDragging(false);
-      const func = linearRegr(map);
-      console.log(map);
-      console.log(func);
+      const velX_t = powerRule(linearRegr(map, "t", "x"));
+      const funcT_x = linearRegr(map, "x", "t");
+      const velY_t = powerRule(linearRegr(map, "t", "y"));
+      const funcT_y = linearRegr(map, "y", "t");
+
+      // console.log(velY_t);
+      // console.log(velX_t);
     };
 
     canvas.onmousemove = (e) => {
       if (dragging) {
-        map.push({ x: e.clientX-offsetX, y: e.clientY-offsetY });
+        map.push({ t: 0.1 * map.length, x: e.clientX-offsetX, y: e.clientY-offsetY });
         ctx.fillRect(e.clientX-offsetX, e.clientY-offsetY,1,1);
       }
     }
@@ -47,8 +52,8 @@ export default function Home() {
 }
 
 
-function linearRegr(obj) {
-  const {a, b} = genArr(obj);
+function linearRegr(obj, independent, dependent) {
+  const {a, b} = genArr(obj, independent, dependent);
 
   const matA = new Matrix(a);
   const matB = new Matrix(b);
@@ -59,7 +64,7 @@ function linearRegr(obj) {
   return func;
 }
 
-function genArr(obj) {
+function genArr(obj, independent, dependednt) {
   const n = obj.length;
   const a = new Array();
   const b = new Array();
@@ -69,15 +74,25 @@ function genArr(obj) {
     const tmp = new Array();
 
     for (let i = 0; i < n - 1; i++) {
-      tmp.push(Math.pow(currX.x, i))
+      tmp.push(Math.pow(currX[independent], i))
     }
     a.push(tmp);
 
     const tmp2 = new Array();
-    tmp2.push(currX.y);
+    tmp2.push(currX[dependednt]);
     b.push(tmp2);
   }
   // console.log(b);
   return {a: a, b: b};
+}
+
+function powerRule(obj) {
+  const derivative = new Array();
+  for (let i = 1; i < obj.data.length; i++) {
+    // console.log(obj.data[i])
+    derivative.push(obj.data[i][0] * (1 + i))
+  }
+
+  return derivative;
 }
 
