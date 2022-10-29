@@ -25,15 +25,16 @@ export default function Home() {
       const funcT_x = polyRegr(map, "x", "t");
       const velY_t = powerRule(polyRegr(map, "t", "y"));
       const funcT_y = polyRegr(map, "y", "t");
-
-      // console.log(velY_t);
-      // console.log(velX_t);
+      // ctx.endPath();
+      ctx.stroke();
+      console.log(velY_t);
+      console.log(velX_t);
     };
 
     canvas.onmousemove = (e) => {
       if (dragging) {
         map.push({ t: 0.1 * map.length, x: e.clientX-offsetX, y: e.clientY-offsetY });
-        ctx.fillRect(e.clientX-offsetX, e.clientY-offsetY,1,1);
+        ctx.lineTo(e.clientX-offsetX, e.clientY-offsetY);
       }
     }
   });
