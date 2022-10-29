@@ -21,10 +21,10 @@ export default function Home() {
 
     canvas.onmouseup = () => {
       setDragging(false);
-      const velX_t = powerRule(linearRegr(map, "t", "x"));
-      const funcT_x = linearRegr(map, "x", "t");
-      const velY_t = powerRule(linearRegr(map, "t", "y"));
-      const funcT_y = linearRegr(map, "y", "t");
+      const velX_t = powerRule(polyRegr(map, "t", "x"));
+      const funcT_x = polyRegr(map, "x", "t");
+      const velY_t = powerRule(polyRegr(map, "t", "y"));
+      const funcT_y = polyRegr(map, "y", "t");
 
       // console.log(velY_t);
       // console.log(velX_t);
@@ -52,7 +52,7 @@ export default function Home() {
 }
 
 
-function linearRegr(obj, independent, dependent) {
+function polyRegr(obj, independent, dependent) {
   const {a, b} = genArr(obj, independent, dependent);
 
   const matA = new Matrix(a);
