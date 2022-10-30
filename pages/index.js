@@ -5,7 +5,8 @@ import { Matrix, inverse } from "ml-matrix";
 
 export default function Home() {
   const [dragging, setDragging] = useState(false);
-  const [loaded, setLoaded] = useState(false);
+  const [loadedImage, setLoadedImage] = useState(false);
+  const [loadingPath, setLoadingPath] = useState(false);
   const limit = 100;
 
   useEffect(() => {
@@ -27,11 +28,11 @@ export default function Home() {
     canvas.ontouchstart = downEvent;
 
     background.onload = () => {
-      if (!loaded) {
+      if (!loadedImage) {
         canvas.width = background.width;
         canvas.height = background.height;
         ctx.drawImage(background, 0, 0);
-        setLoaded(true);
+        setLoadedImage(true);
       }
     }
 
@@ -89,7 +90,12 @@ function polyRegr(obj, independent, dependent) {
   const matB = new Matrix(b);
   const matATrans = matA.transpose();
   if (matA.size > 0) {
-    const final = inverse(matATrans.mmul(matA), true);
+    let final;
+    try {
+      final = inverse(matATrans.mmul(matA));
+    } catch (_err) {
+      final = inverse(matATrans.mmul(matA), true);
+    }
     const func = final.mmul(matATrans).mmul(matB);
 
     return func;
