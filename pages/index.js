@@ -1,43 +1,72 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import { useEffect, useState } from 'react';
 import styles from '../styles/Home.module.css'
 import { Matrix, inverse } from "ml-matrix";
 
 export default function Home() {
   const [dragging, setDragging] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const limit = 100;
 
   useEffect(() => {
+    let background = new Image();
+    background.src = "/images/path.jpeg";
+
     const map = new Array();
     const canvas = document.getElementById("canvas");
     const offsetX = canvas.offsetLeft;
     const offsetY = canvas.offsetTop;
     const ctx = canvas.getContext("2d");
 
-    canvas.onmousedown = () => {
+    const downEvent = () => {
       setDragging(true);
       ctx.beginPath()
     };
 
-    canvas.onmouseup = () => {
+    canvas.onmousedown = downEvent;
+    canvas.ontouchstart = downEvent;
+
+    background.onload = () => {
+      if (!loaded) {
+        canvas.width = background.width;
+        canvas.height = background.height;
+        ctx.drawImage(background, 0, 0);
+        setLoaded(true);
+      }
+    }
+
+    const dragEvent = () => {
       setDragging(false);
-      const velX_t = powerRule(polyRegr(map, "t", "x"));
+      const posX_t = polyRegr(map, "t", "x");
+      const posY_t = polyRegr(map, "t", "y");
+      let velX_t;
+      let velY_t;
+      if (typeof posX_t !== "undefined" && typeof posY_t !== "undefined") {
+        velX_t = powerRule(posX_t);
+        velY_t = powerRule(posY_t);
+      }
       const funcT_x = polyRegr(map, "x", "t");
-      const velY_t = powerRule(polyRegr(map, "t", "y"));
       const funcT_y = polyRegr(map, "y", "t");
-      // ctx.endPath();
       ctx.stroke();
-      console.log(velY_t);
-      console.log(velX_t);
     };
 
-    canvas.onmousemove = (e) => {
+    canvas.onmouseup = dragEvent;
+    canvas.ontouchend = dragEvent;
+
+    const moveEvent = (e) => {
       if (dragging) {
-        map.push({ t: 0.1 * map.length, x: e.clientX-offsetX, y: e.clientY-offsetY });
+        map.push({ t: 0.1 * map.length, x: e.clientX-offsetX-(canvas.clientWidth/2), y: -(e.clientY-offsetY) + (canvas.clientHeight/2) });
+        // console.log(canvas.clientWidth);
+        // console.log(canvas.clientHeight);
         ctx.lineTo(e.clientX-offsetX, e.clientY-offsetY);
       }
     }
+
+    canvas.onmousemove = moveEvent;
+    canvas.ontouchmove = moveEvent;
   });
+
+  
   return (
     <div className={styles.container}>
       <Head>
@@ -46,7 +75,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <canvas id="canvas"></canvas>
+        <canvas id="canvas" width="300" height="300"></canvas>
       </main>
     </div>
   )
@@ -59,10 +88,12 @@ function polyRegr(obj, independent, dependent) {
   const matA = new Matrix(a);
   const matB = new Matrix(b);
   const matATrans = matA.transpose();
-  const final = inverse(matATrans.mmul(matA));
-  const func = final.mmul(matATrans).mmul(matB);
+  if (matA.size > 0) {
+    const final = inverse(matATrans.mmul(matA), true);
+    const func = final.mmul(matATrans).mmul(matB);
 
-  return func;
+    return func;
+  }
 }
 
 function genArr(obj, independent, dependednt) {
