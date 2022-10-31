@@ -38,17 +38,13 @@ export default function Home() {
 
     const dragEvent = () => {
       setDragging(false);
-      const posX_t = polyRegr(map, "t", "x");
-      const posY_t = polyRegr(map, "t", "y");
-      let velX_t;
-      let velY_t;
-      if (typeof posX_t !== "undefined" && typeof posY_t !== "undefined") {
-        velX_t = powerRule(posX_t);
-        velY_t = powerRule(posY_t);
-      }
-      const funcT_x = polyRegr(map, "x", "t");
-      const funcT_y = polyRegr(map, "y", "t");
-      ctx.stroke();
+      console.log(`(${map[0].t}, ${map[0].x}, ${map[0].y})`)
+
+      genArr(map, "t", "x");
+      genArr(map, "t", "y");
+
+      genArr(map, "x", "t");
+      genArr(map, "y", "t");
     };
 
     canvas.onmouseup = dragEvent;
@@ -56,10 +52,11 @@ export default function Home() {
 
     const moveEvent = (e) => {
       if (dragging) {
-        map.push({ t: 0.1 * map.length, x: e.clientX-offsetX-(canvas.clientWidth/2), y: -(e.clientY-offsetY) + (canvas.clientHeight/2) });
+        map.push({ t: map.length * .1, x: e.clientX-offsetX-(canvas.clientWidth/2), y: -(e.clientY-offsetY) + (canvas.clientHeight/2) });
         // console.log(canvas.clientWidth);
         // console.log(canvas.clientHeight);
         ctx.lineTo(e.clientX-offsetX, e.clientY-offsetY);
+        ctx.stroke();
       }
     }
 
@@ -83,45 +80,38 @@ export default function Home() {
 }
 
 
-function polyRegr(obj, independent, dependent) {
-  const {a, b} = genArr(obj, independent, dependent);
+// function polyRegr(obj, independent, dependent) {
+//   const {a, b} = genArr(obj, independent, dependent);
+//   const matA = new Matrix(a);
+//   const matB = new Matrix(b);
+//   const matATrans = matA.transpose();
+//   if (matA.size > 0) {
+//     let final;
+//     final = inverse(matATrans.mmul(matA));
 
-  const matA = new Matrix(a);
-  const matB = new Matrix(b);
-  const matATrans = matA.transpose();
-  if (matA.size > 0) {
-    let final;
-    try {
-      final = inverse(matATrans.mmul(matA));
-    } catch (_err) {
-      final = inverse(matATrans.mmul(matA), true);
-    }
-    const func = final.mmul(matATrans).mmul(matB);
+//     const func = final.mmul(matATrans).mmul(matB);
 
-    return func;
-  }
-}
+//     return func;
+//   }
+// }
 
 function genArr(obj, independent, dependednt) {
   const n = obj.length;
   const a = new Array();
   const b = new Array();
-
   for (let i = 0; i < n; i++) {
-    const currX = obj[i];
-    const tmp = new Array();
-
-    for (let i = 0; i < n - 1; i++) {
-      tmp.push(Math.pow(currX[independent], i))
-    }
-    a.push(tmp);
-
-    const tmp2 = new Array();
-    tmp2.push(currX[dependednt]);
-    b.push(tmp2);
+    a.push(obj[i][independent])
+    b.push(obj[i][dependednt])
   }
-  // console.log(b);
-  return {a: a, b: b};
+  try {
+    fetch("/api/spline", {
+      method: "POST",
+      body: JSON.stringify({
+        type: `${dependednt}_${independent}`,
+        a, b
+      })
+    })
+  } catch {}
 }
 
 function powerRule(obj) {
@@ -132,5 +122,15 @@ function powerRule(obj) {
   }
 
   return derivative;
+}
+
+function takeInput(obj, input) {
+  let out = 0;
+  for (let i = 0; i < obj.data.length; i++) {
+    const coeff = obj.data[i][0];
+    out += coeff * Math.pow(input, i);
+  }
+
+  return out;
 }
 
