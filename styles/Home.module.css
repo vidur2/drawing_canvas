@@ -114,3 +114,7 @@
     flex-direction: column;
   }
 }
+
+.coordinatePair {
+  width: 8%;
+}
