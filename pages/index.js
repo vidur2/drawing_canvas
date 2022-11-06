@@ -119,12 +119,8 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <table>
-        <tr>
-        <td>
+      
         <canvas id="canvas" width="300" height="300"></canvas>
-        </td>
-        <td>
         <form onSubmit={handleAprilTag}>
         {/* <p>{counter}</p> */}
         {aprilArr.map((tag, i) => {
@@ -146,9 +142,6 @@ export default function Home() {
         <button type="submit">Submit</button>
         </p>
         </form>
-        </td>
-        </tr>
-        </table>
       </main>
     </div>
   )
