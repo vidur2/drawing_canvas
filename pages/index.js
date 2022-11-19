@@ -50,6 +50,8 @@ export default function Home() {
 
       genArr(map, "x", "t");
       genArr(map, "y", "t");
+
+      genArr(map, "y", "x");
     };
 
     canvas.onmouseup = dragEvent;
@@ -121,8 +123,7 @@ export default function Home() {
       <main className={styles.main}>
       
         <canvas id="canvas" width="300" height="300"></canvas>
-        <form onSubmit={handleAprilTag}>
-        {/* <p>{counter}</p> */}
+        {/* <form onSubmit={handleAprilTag}>
         {aprilArr.map((tag, i) => {
           return (
             <div key={i}>
@@ -141,7 +142,7 @@ export default function Home() {
         <p>
         <button type="submit">Submit</button>
         </p>
-        </form>
+        </form> */}
       </main>
     </div>
   )
@@ -163,19 +164,19 @@ export default function Home() {
 //   }
 // }
 
-function genArr(obj, independent, dependednt) {
+function genArr(obj, independent, dependent) {
   const n = obj.length;
   const a = new Array();
   const b = new Array();
   for (let i = 0; i < n; i++) {
     a.push(obj[i][independent])
-    b.push(obj[i][dependednt])
+    b.push(obj[i][dependent])
   }
   try {
     fetch("/api/spline", {
       method: "POST",
       body: JSON.stringify({
-        type: `${dependednt}_${independent}`,
+        type: `${dependent}_${independent}`,
         a, b
       })
     })
