@@ -12,11 +12,13 @@ export default function Home() {
   // const [loadingPath, setLoadingPath] = useState(false);
   const width = 16.48459999998984/2;
   const height = 8.10259999998984/2;
+  // const height = 2/2;
+  // const width = 2/2;
   const formIds = ["x", "y", "rotation", "id"];
 
   useEffect(() => {
-    let background = new Image();
-    background.src = "/images/path.jpeg";
+    // let background = new Image();
+    // background.src = "/images/path.jpeg";
 
     const map = new Array();
     const canvas = document.getElementById("canvas");
@@ -32,14 +34,14 @@ export default function Home() {
     canvas.onmousedown = downEvent;
     canvas.ontouchstart = downEvent;
 
-    background.onload = () => {
-      if (!loadedImage) {
-        canvas.width = background.width;
-        canvas.height = background.height;
-        ctx.drawImage(background, 0, 0);
-        setLoadedImage(true);
-      }
-    }
+    // background.onload = () => {
+    //   if (!loadedImage) {
+    //     canvas.width = background.width;
+    //     canvas.height = background.height;
+    //     ctx.drawImage(background, 0, 0);
+    //     setLoadedImage(true);
+    //   }
+    // }
 
     const dragEvent = () => {
       setDragging(false);
@@ -51,7 +53,7 @@ export default function Home() {
       genArr(map, "x", "t");
       genArr(map, "y", "t");
 
-      genArr(map, "y", "x");
+      genArr(map, "x", "y");
     };
 
     canvas.onmouseup = dragEvent;
@@ -89,7 +91,7 @@ export default function Home() {
     });
     aprilArr.push(aprilObj)
 
-    fetch("http://localhost:5001/aprilPos", {
+    fetch("http://192.168.1.68:5001/aprilPos", {
       method: "POST",
       body: JSON.stringify({
         aprilPose: aprilArr
@@ -122,7 +124,7 @@ export default function Home() {
       </Head>
       <main className={styles.main}>
       
-        <canvas id="canvas" width="300" height="300"></canvas>
+        <canvas id="canvas" width="300" height="300" className={styles.canvas}></canvas>
         {/* <form onSubmit={handleAprilTag}>
         {aprilArr.map((tag, i) => {
           return (

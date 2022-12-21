@@ -28,6 +28,10 @@
   flex-grow: 1;
 }
 
+.canvas {
+  border: 1px solid black;
+}
+
 .title a {
   color: #0070f3;
   text-decoration: none;
